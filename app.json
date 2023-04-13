@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "FarmingApp",
+    "slug": "FarmingApp",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
