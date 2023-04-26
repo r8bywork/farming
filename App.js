@@ -5,6 +5,7 @@ import { StyleSheet } from "react-native";
 import CreateJob from "./pages/CreateJob/CreateJob";
 import HomePage from "./pages/HomePage/HomePage";
 import LoginPage from "./pages/LoginPage/LoginPage";
+import RegPage from "./pages/RegPage/RegPage";
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,7 @@ export default function App() {
 				<Stack.Screen name="LoginPage" component={LoginPage} />
 				<Stack.Screen name="HomePage" component={HomePage} />
 				<Stack.Screen name="CreateJob" component={CreateJob} />
+				<Stack.Screen name="RegPage" component={RegPage} />
 			</Stack.Navigator>
 		</NavigationContainer>
 		// </View>

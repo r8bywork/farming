@@ -10,17 +10,64 @@ import {
 } from "react-native";
 import { Button, Card } from "react-native-paper";
 
-const HomePage = () => {
+const HomePage = ({ route }) => {
+	const { user } = route.params;
 	const [jobs, setJobs] = useState([]);
 	const [selectedJob, setSelectedJob] = useState(null);
 	const [completedWork, setCompletedWork] = useState("");
 	const navigation = useNavigation();
+	const [isAdmin, setIsAdmin] = useState("");
+
+	// const getUserInfo = async (token) => {
+	// 	try {
+	// 		const response = await axios.get(
+	// 			"http://192.168.0.115:3001/auth/findUser",
+	// 			{
+	// 				headers: {
+	// 					Authorization: `Bearer ${token}`,
+	// 				},
+	// 			}
+	// 		);
+	// 		// console.log(response.data);
+	// 		return response.data;
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 		return null;
+	// 	}
+	// };
+	// console.clear();
+	// // getUserInfo(user.token);
+	// const asd = getUserInfo(user.token);
+	// console.log(asd);
+
+	const getUserInfo = async (token) => {
+		try {
+			const response = await axios.get(
+				"http://192.168.0.115:3001/auth/findUser",
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+			return response.data;
+		} catch (error) {
+			console.log(error);
+			return null;
+		}
+	};
+	const hadleLogin = async () => {
+		const userInfo = await getUserInfo(String(user.token));
+		setIsAdmin(userInfo);
+		console.log(isAdmin);
+	};
 
 	useEffect(() => {
 		axios
 			.get("http://192.168.0.115:3001/jobs/getAllJobs")
 			.then((response) => setJobs(response.data))
 			.catch((error) => console.log(error));
+		hadleLogin();
 	}, []);
 
 	const handleJobPress = (job) => {
@@ -33,31 +80,40 @@ const HomePage = () => {
 	};
 
 	const handleSave = () => {
-		axios
-			.put(`http://192.168.0.115:3001/jobs/updateJob/${selectedJob._id}`, {
-				completedWork: parseInt(completedWork),
-			})
-			.then(() => {
-				const updatedJobs = jobs.map((job) => {
-					if (job._id === selectedJob._id) {
-						return { ...job, completedWork: parseInt(completedWork) };
-					}
-					return job;
-				});
-				setJobs(updatedJobs);
-				setSelectedJob(null);
-				setCompletedWork("");
-			})
-			.catch((error) => console.log(error));
+		if (completedWork > selectedJob.completedWork) {
+			axios
+				.put(`http://192.168.0.115:3001/jobs/updateJob/${selectedJob._id}`, {
+					completedWork: parseInt(completedWork),
+				})
+				.then(() => {
+					const updatedJobs = jobs.map((job) => {
+						if (job._id === selectedJob._id) {
+							return { ...job, completedWork: parseInt(completedWork) };
+						}
+						return job;
+					});
+					setJobs(updatedJobs);
+					setSelectedJob(null);
+					setCompletedWork("");
+				})
+				.catch((error) => console.log(error));
+		} else {
+			console.log("Kick");
+		}
 	};
 
 	const renderItem = ({ item }) => (
 		<TouchableOpacity onPress={() => handleJobPress(item)}>
 			<Card style={styles.card}>
-				<Card.Cover source={{ uri: "https://picsum.photos/700" }} />
+				{/* <Card.Cover source={{ uri: "https://picsum.photos/700" }} /> */}
 				<Card.Title
 					title={item.responsibility}
-					subtitle={"Последнее значение " + item.completedWork}
+					subtitle={
+						"Выполненная работа за сегодня " +
+						item.completedWork +
+						" " +
+						item.unit
+					}
 				/>
 				{selectedJob && selectedJob._id === item._id && (
 					<View style={styles.inputContainer}>
@@ -68,7 +124,7 @@ const HomePage = () => {
 							onChangeText={handleCompletedWorkChange}
 						/>
 						<Button style={styles.button} onPress={handleSave}>
-							Save
+							Сохранить
 						</Button>
 					</View>
 				)}
@@ -84,13 +140,20 @@ const HomePage = () => {
 				keyExtractor={(item) => item._id}
 				ItemSeparatorComponent={() => <View style={styles.separator} />}
 			/>
-			<Button
-				icon="camera"
-				mode="contained"
-				onPress={() => navigation.navigate("CreateJob")}
-			>
-				Create Job
-			</Button>
+			{isAdmin == "admin" ? (
+				<Button
+					style={styles.button1}
+					mode="contained"
+					onPress={() => navigation.navigate("CreateJob")}
+				>
+					Создать работу
+				</Button>
+			) : null}
+			{isAdmin == "admin" ? (
+				<Button mode="contained" onPress={() => navigation.navigate("RegPage")}>
+					Зарегестрировать рабочего
+				</Button>
+			) : null}
 		</View>
 	);
 };
@@ -124,6 +187,9 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		marginLeft: 10,
+	},
+	button1: {
+		marginBottom: 10,
 	},
 });
 

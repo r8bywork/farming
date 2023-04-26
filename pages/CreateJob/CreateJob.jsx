@@ -18,6 +18,7 @@ const CreateJob = () => {
 				{
 					responsibility,
 					completedWork,
+					unit,
 				}
 			);
 
@@ -30,26 +31,26 @@ const CreateJob = () => {
 	return (
 		<ScrollView style={styles.container}>
 			<TextInput
-				label="Responsibility"
+				label="Наименование"
 				value={responsibility}
 				onChangeText={(text) => setResponsibility(text)}
 				style={styles.input}
 			/>
 			<TextInput
-				label="Completed Work"
+				label="Количество выполненой работы"
 				value={completedWork}
 				onChangeText={(text) => setCompletedWork(text)}
 				style={styles.input}
 			/>
 			<TextInput
-				label="Unit"
+				label="Единица измерения"
 				value={unit}
 				onChangeText={(text) => setUnit(text)}
 				style={styles.input}
 			/>
 			<Divider style={styles.divider} />
 			<Button mode="contained" onPress={handleSubmit} style={styles.button}>
-				Submit
+				Сохранить
 			</Button>
 			<Snackbar
 				visible={snackbarVisible}

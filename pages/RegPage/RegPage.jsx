@@ -3,25 +3,23 @@ import axios from "axios";
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button, TextInput } from "react-native-paper";
-export default LoginPage = () => {
+
+export default RegPage = () => {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const navigation = useNavigation();
-	const handleLogin = async () => {
+
+	const handleRegistration = async () => {
 		console.clear();
 		try {
 			const response = await axios.post(
-				"http://192.168.0.115:3001/auth/login",
+				"http://192.168.0.115:3001/auth/register",
 				{
 					username,
 					password,
 				}
 			);
-
-			// response.status === 200 ? navigation.navigate("HomePage") : null;
-			response.status === 200
-				? navigation.navigate("HomePage", { user: response.data })
-				: null;
+			response.status === 200 ? navigation.navigate("LoginPage") : null;
 		} catch (error) {
 			console.log(error);
 		}
@@ -30,7 +28,7 @@ export default LoginPage = () => {
 	return (
 		<View style={styles.container}>
 			<TextInput
-				label="Ваш логин для входа"
+				label="Ваш логин для регистрации"
 				placeholder="Логин"
 				style={styles.input}
 				onChangeText={(username) => setUsername(username.toLowerCase())}
@@ -44,8 +42,8 @@ export default LoginPage = () => {
 				onChangeText={(password) => setPassword(password.toLowerCase())}
 				value={password}
 			/>
-			<Button mode="contained" onPress={handleLogin}>
-				Вход
+			<Button mode="contained" onPress={handleRegistration}>
+				Регистрация
 			</Button>
 		</View>
 	);
