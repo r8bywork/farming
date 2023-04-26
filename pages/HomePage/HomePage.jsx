@@ -17,28 +17,8 @@ const HomePage = ({ route }) => {
 	const [completedWork, setCompletedWork] = useState("");
 	const navigation = useNavigation();
 	const [isAdmin, setIsAdmin] = useState("");
-
-	// const getUserInfo = async (token) => {
-	// 	try {
-	// 		const response = await axios.get(
-	// 			"http://192.168.0.115:3001/auth/findUser",
-	// 			{
-	// 				headers: {
-	// 					Authorization: `Bearer ${token}`,
-	// 				},
-	// 			}
-	// 		);
-	// 		// console.log(response.data);
-	// 		return response.data;
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 		return null;
-	// 	}
-	// };
-	// console.clear();
-	// // getUserInfo(user.token);
-	// const asd = getUserInfo(user.token);
-	// console.log(asd);
+	const [loading, isLoading] = useState(false);
+	const [update, setUpdate] = useState(false);
 
 	const getUserInfo = async (token) => {
 		try {
@@ -63,12 +43,15 @@ const HomePage = ({ route }) => {
 	};
 
 	useEffect(() => {
+		isLoading(true);
 		axios
 			.get("http://192.168.0.115:3001/jobs/getAllJobs")
 			.then((response) => setJobs(response.data))
 			.catch((error) => console.log(error));
 		hadleLogin();
-	}, []);
+		setUpdate(false);
+		isLoading(false);
+	}, [update]);
 
 	const handleJobPress = (job) => {
 		setSelectedJob(job);
@@ -81,6 +64,7 @@ const HomePage = ({ route }) => {
 
 	const handleSave = () => {
 		if (completedWork > selectedJob.completedWork) {
+			isLoading(true);
 			axios
 				.put(`http://192.168.0.115:3001/jobs/updateJob/${selectedJob._id}`, {
 					completedWork: parseInt(completedWork),
@@ -96,7 +80,8 @@ const HomePage = ({ route }) => {
 					setSelectedJob(null);
 					setCompletedWork("");
 				})
-				.catch((error) => console.log(error));
+				.catch((error) => console.log(error))
+				.finally(() => isLoading(false));
 		} else {
 			console.log("Kick");
 		}
@@ -123,7 +108,11 @@ const HomePage = ({ route }) => {
 							value={completedWork}
 							onChangeText={handleCompletedWorkChange}
 						/>
-						<Button style={styles.button} onPress={handleSave}>
+						<Button
+							style={styles.button}
+							onPress={handleSave}
+							loading={loading}
+						>
 							Сохранить
 						</Button>
 					</View>
@@ -140,11 +129,19 @@ const HomePage = ({ route }) => {
 				keyExtractor={(item) => item._id}
 				ItemSeparatorComponent={() => <View style={styles.separator} />}
 			/>
+			<Button
+				style={styles.button1}
+				mode="contained"
+				onPress={() => setUpdate(true)}
+				loading={loading}
+			>
+				Обновление ленты
+			</Button>
 			{isAdmin == "admin" ? (
 				<Button
 					style={styles.button1}
 					mode="contained"
-					onPress={() => navigation.navigate("CreateJob")}
+					onPress={() => navigation.navigate("CreateJob", { user: user })}
 				>
 					Создать работу
 				</Button>

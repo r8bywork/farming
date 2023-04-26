@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import { Button, Divider, Snackbar, TextInput } from "react-native-paper";
 
-const CreateJob = () => {
+const CreateJob = ({ route }) => {
+	const { user } = route.params;
 	const navigation = useNavigation();
 	const [responsibility, setResponsibility] = useState("");
 	const [completedWork, setCompletedWork] = useState("");
@@ -22,7 +23,8 @@ const CreateJob = () => {
 				}
 			);
 
-			response.status === 201 && navigation.navigate("HomePage");
+			response.status === 201 &&
+				navigation.navigate("HomePage", { user: user });
 		} catch (error) {
 			console.error(error);
 		}
